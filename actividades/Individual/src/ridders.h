@@ -78,15 +78,12 @@ namespace ridders {
 	            } 
 
 	            if(isnan(x4)) {
-	                cout << "Se ha presentado un error al intentar calcular los nuevos valores con la precision definida." << "{ x4 = " << setprecision(DOUBLE_PRECISION) << x4 << endl;
+	                cout << "Se ha presentado un error al intentar calcular los nuevos valores con la precision definida." << "{ x4 = " << x4 << endl;
 	                return -1.0;
 	            }
 
-	            cout << "---- Iteracion: " << ++iter << endl;
-	            cout << "Valores x: " << "{ x1 = " << setprecision(DOUBLE_PRECISION) << x1 << ", x2 = " << setprecision(DOUBLE_PRECISION) << x2 << ", x3 = " << setprecision(DOUBLE_PRECISION) << x3 << ", x4 = " << setprecision(DOUBLE_PRECISION) << x4 << " }" <<endl; 
-	            cout << "Valores de la funcion: " << "{ fx1 = " << setprecision(DOUBLE_PRECISION) << fx1 << ", fx2 = " << setprecision(DOUBLE_PRECISION) << fx2 << ", fx3 = " << setprecision(DOUBLE_PRECISION) << fx3 << ", fx4 = " << setprecision(DOUBLE_PRECISION) << fx4 << " }" << endl; 
+                iter++;
 	        } else {
-	            cout << "Ridders ha encontrado una raiz con la precision esperada! :)" << endl;
 	            break;
 	        }
 	    } while(iter < MAX_ITERATIONS);
@@ -96,8 +93,8 @@ namespace ridders {
             return -1.0;
         }
 
-        cout << "Numero de iteraciones: " << iter << endl;  
-        cout << "Raiz aproximada: " << setprecision(DOUBLE_PRECISION) << x4 << endl; 
+        cout << "Its\tx1\t\t\tx2\t\t\tx3" << endl;
+        cout << iter << '\t' << x1 << '\t' << x2 << '\t' << x4 << endl;
 
         return x4;
 	}

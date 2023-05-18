@@ -88,10 +88,7 @@ namespace muller {
         double c = get_c(x0);
         double xr = get_xr(x0, a, b, c);
         double fxr = func(xr); // valor de la funcion en el cero aproximado
-
-        cout << "Valores INICIALES x: " << "{ x2 = " << setprecision(DOUBLE_PRECISION) << x2 << ", x0 = " << setprecision(DOUBLE_PRECISION) << x0 << ", x1 = " << setprecision(DOUBLE_PRECISION) << x1 << ", f(xr) = " << setprecision(DOUBLE_PRECISION) << fxr << " }" <<endl; 
-        cout << "Coeficientes INICIALES : " << "{ a = " << setprecision(DOUBLE_PRECISION) << a << ", b = " << setprecision(DOUBLE_PRECISION) << b << ", c = " << setprecision(DOUBLE_PRECISION) << c << ", xr = " << setprecision(DOUBLE_PRECISION) << xr << " }" << endl; 
-
+        
         do {
             if(fabs(fxr) > EPSILON and fabs(x2 - x1) > EPSILON) {
                 // nos movemos a la derecha
@@ -113,15 +110,12 @@ namespace muller {
                 fxr = func(xr);
 
                 if(isnan(a) or isnan(b) or isnan(c) or isnan(xr)) {
-                    cout << "Se ha presentado un error al intentar calcular los coeficientes o la raiz con la precision definida." << "{ a = " << setprecision(DOUBLE_PRECISION) << a << ", b = " << setprecision(DOUBLE_PRECISION) << b << ", c = " << setprecision(DOUBLE_PRECISION) << c << ", xr = " << setprecision(DOUBLE_PRECISION) << xr << " }" << endl;
+                    cout << "Se ha presentado un error al intentar calcular los coeficientes o la raiz con la precision definida." << "{ a = " << a << ", b = " << b << ", c = " << c << ", xr = " << xr << " }" << endl;
                     return -1.0;
                 }
-
-                cout << "---- Iteracion: " << ++iter << endl;
-                cout << "Valores x: " << "{ x2 = " << setprecision(DOUBLE_PRECISION) << x2 << ", x0 = " << setprecision(DOUBLE_PRECISION) << x0 << ", x1 = " << setprecision(DOUBLE_PRECISION) << x1 << ", f(xr) = " << setprecision(DOUBLE_PRECISION) << fxr << " }" <<endl; 
-                cout << "Coeficientes: " << "{ a = " << setprecision(DOUBLE_PRECISION) << a << ", b = " << setprecision(DOUBLE_PRECISION) << b << ", c = " << setprecision(DOUBLE_PRECISION) << c << ", xr = " << setprecision(DOUBLE_PRECISION) << xr << " }" << endl; 
+                
+                iter++;
             } else {
-                cout << "Muller ha encontrado una raiz con la precision esperada! :)" << endl;
                 break;
             }
         } while(iter < MAX_ITERATIONS);
@@ -131,8 +125,8 @@ namespace muller {
             return -1.0;
         }
 
-        cout << "Numero de iteraciones: " << iter << endl;  
-        cout << "Raiz aproximada: " << setprecision(DOUBLE_PRECISION) << xr << endl; 
+        cout << "Its\tx1\t\t\tx2\t\t\tx3" << endl;
+        cout << iter << '\t' << x1 << '\t' << x2 << '\t' << xr << endl;
 
         return xr;
     }
