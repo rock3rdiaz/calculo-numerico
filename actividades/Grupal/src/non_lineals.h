@@ -25,10 +25,9 @@ using namespace norma_l1;
 using namespace inversion;
 using namespace lu;
 
-const double e0 { 1.0e-14 }; // valor de tolerancia
+const double e0 { 0.0e-14 }; // valor de tolerancia
 
 namespace non_lineals {
-
 
     /**
      *
@@ -36,9 +35,9 @@ namespace non_lineals {
      * El parametro de salida 'o_fs' almacena F(x, y)
      *
      */
-    void fx(const double &x, const double &y, array<double, 2> &o_fs) {
-        o_fs[0] = pow(x, 2) + (x * pow(y, 3)) - 9;
-        o_fs[1] = (3 * pow(x, 2) * y) - pow(y, 3) - 4;
+    void fx(array<double, 2> &p, array<double, 2> &o_fs) {
+        o_fs[0] = pow(p[0], 2) + (p[0] * pow(p[1], 3)) - 9;
+        o_fs[1] = (3 * pow(p[0], 2) * p[1]) - pow(p[1], 3) - 4;
     }
 
     /**
@@ -47,11 +46,11 @@ namespace non_lineals {
      * El parametro de salida 'o_jfs' almacena JF(x, y).
      *
      */
-    void jfx(const double &x, const double &y, array<array<double, 2>, 2> &o_jfs) {
-        o_jfs[0][0] = 2 * pow(x, 2) + pow(y, 3);
-        o_jfs[0][1] = 3 * x * pow(y, 2);
-        o_jfs[1][0] = 6 * x * y;
-        o_jfs[1][1] = 3 * pow(x, 2) - 3 * pow(y, 2);
+    void jfx(array<double, 2> &p, vector<vector<double>> &o_jfs) {
+        o_jfs[0][0] = (2 * p[0]) + (pow(p[1], 3));
+        o_jfs[0][1] = 3 * p[0] * pow(p[1], 2);
+        o_jfs[1][0] = 6 * p[0] * p[1];
+        o_jfs[1][1] = (3 * pow(p[0], 2)) - (3 * pow(p[1], 2));
     }
 
     /**
@@ -61,49 +60,40 @@ namespace non_lineals {
      */
     void Newton_nD(array<double, 2> &initial_approx) {
         array<double, 2> _fx { 0.0, 0.0 }; // referencia a F(x0)
-        array<array<double, 2>, 2> _jfx { { { 0.0, 0.0 }, { 0.0, 0.0 } } }; // referencia a JF(X0)
-        
-        // Declaramos la matriz A como un vector de vectores (2x2)
-        vector<vector<double>> A (2, vector<double>(2));
-        
-        // Definimos el vector de terminos independientes
-        vector<double> w = { 9.0, 4.0 };
+        vector<vector<double>> _jfx (2, vector<double>(2)); // referencia a JF(x0)
+        vector<double> w (2); // Definimos el vector de terminos independientes
         
         // Vector de permutaciones y determinante
         vector<int> perm(2);
         double det;
 
-        // Inicializamos A
-        A[0][0] = 1.0; A[0][1] = 1.0;
-        A[1][0] = 3.0; A[1][1] = -1.0;
+        short iter = 1;
 
-        while (abs(_fx[0]) > e0 and abs(_fx[1]) > e0) {
-            double norma_A = norma_l1::norma_l1(A);
+        do {
+            fx(initial_approx, _fx);
+            jfx(initial_approx, _jfx);
+
+            cout << "Iniciando la iteracion " << iter << " con la aproximacion (" << initial_approx[0] << ", " << initial_approx[1] << ")" << endl;
+            cout << "F(x0) = ( " << _fx[0] << "\t" << _fx[1] << " )" << endl;
+            cout << "JF(x0) = ( " << _jfx[0][0] << "\t" << _jfx[0][1] << " ; " << _jfx[1][0] << "\t" << _jfx[1][1] << ")" << endl;
+        
+            w[0] = -1 * _fx[0];
+            w[1] = -1 * _fx[1];
 
             // Descomposicion LU
-            lu::lu(A, perm, det);
+            lu::lu(_jfx, perm, det);
             
             // Resolucion del sistema de ecuaciones
-            sustitucion::sustitucion(A, perm, w);
+            sustitucion::sustitucion(_jfx, perm, w);
             
-            // Inversion de A
-            inversion::inversion(A, perm);
+            cout << "Solucion con w = ( " << w[0] << "\t" << w[1] << " )" << endl;
+            cout << "\n" << endl;
 
-            // Calculamos la norma L1 de la inversa de A
-            double norma_A_inv = norma_l1::norma_l1(A);
+            initial_approx[0] += w[0];
+            initial_approx[1] += w[1];
 
-            // Obtenemos el numero de condicion
-            double numero_de_condicion = norma_A * norma_A_inv;
-
-            cout << "Numero de condicion: C(A) = " << numero_de_condicion << endl;
-            cout << "Solucion con A: (x = " << w[0] << ", y = " << w[1] << ")" << endl;
- 
-            fx(initial_approx[0], initial_approx[1], _fx);
-            jfx(initial_approx[0], initial_approx[1], _jfx);
-        }
-
-        cout << "F(x0) = {" << " x: " << _fx[0] << ", y: " << _fx[1] << " }" << endl;
-        cout << "JF(x0) = {" << " x00: " << _jfx[0][0] << ", y01: " << _jfx[0][1]  << ", x10: " << _jfx[1][0] << ", y11: " << _jfx[1][1] << "}" << endl;
+            iter++;
+        } while (abs(_fx[0]) > e0 and abs(_fx[1]) > e0);
     }
 }
 
