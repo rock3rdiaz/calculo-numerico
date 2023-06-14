@@ -20,5 +20,4 @@ int main() {
     double e0 {10e-10};
     
     jacobi::jacobi(A, b, e0);
-
 }

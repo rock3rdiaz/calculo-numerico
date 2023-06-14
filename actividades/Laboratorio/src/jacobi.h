@@ -31,7 +31,7 @@ namespace jacobi {
         }
 
         cout << "---------------------------------" << endl;
-        cout << "1. Descomposicion de la matriz A: " << endl;
+        cout << "2. Descomposicion de la matriz A: " << endl;
         cout << "=> M: " << endl;
         cout << M << endl;
         cout << "=> N: " << endl;
@@ -40,7 +40,7 @@ namespace jacobi {
     }
 
     /**
-     * Metodo que genera la primema aproximacion de la solucion.
+     * Metodo que genera la primera aproximacion de la solucion.
      *
      * @param initial_approx: Referencia al vector solucion.
      * @param size: Tamaño del vector solucion.
@@ -50,7 +50,7 @@ namespace jacobi {
         vector<double> x0(size, 0.0);
 
         cout << "---------------------------------" << endl;
-        cout << "2. Generacion de la aproximacion inicial: " << endl;
+        cout << "1. Generacion de la aproximacion inicial: " << endl;
         cout << "=> x0: " << endl;
         cout << x0 << endl;
         cout << "---------------------------------" << endl;
@@ -70,36 +70,42 @@ namespace jacobi {
     *
     */
     int jacobi(const vector<vector<double>> &A, const vector<double> &b, double tolerance) {
+        if(!is_diagonal(A)) {
+            cout << "La matriz A no es predominante diagonal" << endl;
+            return -1;
+        }
+
         double size_A = A[0].size();
 
         vector<vector<double>> M = A;
         vector<vector<double>> N = A;
         vector<double> solution = get_x0(size_A); // vector de soluciones
 
-        if(!is_diagonal(A)) {
-            cout << "La matriz A no es predominante diagonal" << endl;
-            return -1;
-        }
-
         get_decomposition(A, M, N); // Ejecutamos la descomposicion de A en M y N
         
-        for(int i {0}; i < size_A; i++) {
-            double next_value; // valor del i-esimo elemento de la solucion.
-            double sum_N; // sumatoria de los valores fuera de la diagonal en esta iteracion
-            for(int j {0}; j < size_A; j++) {
-                if(j != i) {
-                    sum_N = N[i][j] * solution[j];
+        // modificar acorde a las instrucciones de como comparar con la tolerancia de error
+        short iter {0};
+        while(iter < 100) {
+            for(int i {0}; i < size_A; i++) {
+                double next_value; // valor del i-esimo elemento de la solucion.
+                double sum_N = 0.0; // sumatoria de los valores fuera de la diagonal en esta iteracion
+                for(int j {0}; j < size_A; j++) {
+                    if(j != i) {
+                       sum_N += N[i][j] * solution[j];
+                    }
                 }
+                next_value = (1 / M[i][i]) * (b[i] - sum_N);
+                solution[i] = next_value;
             }
-            next_value = (1 / M[i][i]) * (b[i] - sum_N);
-            solution[i] = next_value;
+            
+            cout << "---------------------------------" << endl;
+            cout << "3. Soluciones aproximadas en la iteracion " << iter << endl;
+            cout << solution << endl;
+            cout << "---------------------------------" << endl;
+
+            iter++;
         }
 
-        cout << "---------------------------------" << endl;
-        cout << "3. Soluciones aproximadas: " << endl;
-        cout << "=> solution: " << endl;
-        cout << solution << endl;
-        cout << "---------------------------------" << endl;
 
         return 0;
     } 
