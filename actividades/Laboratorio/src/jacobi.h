@@ -79,33 +79,39 @@ namespace jacobi {
 
         vector<vector<double>> M = A;
         vector<vector<double>> N = A;
-        vector<double> solution = get_x0(size_A); // vector de soluciones
+        vector<double> solutions = get_x0(size_A); // vector de soluciones
 
         get_decomposition(A, M, N); // Ejecutamos la descomposicion de A en M y N
         
-        // modificar acorde a las instrucciones de como comparar con la tolerancia de error
         short iter {0};
-        while(iter < 100) {
+        double fx_solutions = get_fx(A, b, solutions);
+        while(tolerance < fx_solutions) {
             for(int i {0}; i < size_A; i++) {
                 double next_value; // valor del i-esimo elemento de la solucion.
                 double sum_N = 0.0; // sumatoria de los valores fuera de la diagonal en esta iteracion
                 for(int j {0}; j < size_A; j++) {
                     if(j != i) {
-                       sum_N += N[i][j] * solution[j];
+                       sum_N += N[i][j] * solutions[j];
                     }
                 }
                 next_value = (1 / M[i][i]) * (b[i] - sum_N);
-                solution[i] = next_value;
+                solutions[i] = next_value;
             }
             
             cout << "---------------------------------" << endl;
             cout << "3. Soluciones aproximadas en la iteracion " << iter << endl;
-            cout << solution << endl;
+            cout << solutions << endl;
+            cout << "---------------------------------" << endl;
+            
+            fx_solutions = get_fx(A, b, solutions);
+
+            cout << "---------------------------------" << endl;
+            cout << "4. Aproximacion al valor de tolerancia en la iteracion " << iter << endl;
+            cout << fx_solutions << endl;
             cout << "---------------------------------" << endl;
 
             iter++;
         }
-
 
         return 0;
     } 
