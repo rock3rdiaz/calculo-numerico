@@ -84,37 +84,34 @@ namespace gauss_seidel {
 
         get_decomposition(A, A1, A2); // Ejecutamos la descomposicion de A en A1 y A2
 
-        short iter {0};
+        short iter {0}; // numero de iteraciones
 
-        vector<double> current_iteration(size_A, 0.0); // almacenara los valores de la iteracion actual
-        vector<double> next_iteration(size_A, 0.0); // almacenara los valores de la siguiente iteracion
+        vector<double> solution(size_A, 0.0); // almacenara los valores de la iteracion actual
+        double new_value {0.0}; // nuevo valor de la solucion
+        double diff {0.0}; // diferencia entre las dos ultimas soluciones 
 
-        double solutions_norm = get_euclideam_norm(next_iteration, current_iteration); 
         do {
             for(int i {0}; i < size_A; i++) {
-                double next_value; // valor del i-esimo elemento de la solucion.
-                double current_iteration_sum; // sumatoria de los valores de la solucion actual (x_l)
-                double next_iteration_sum; // sumatoria de los valores de la siguiente iteracion (x_l+1)
+                double sum = b[i];
             
                 for(int j {0}; j < size_A; j++) {
                     if(j != i) {
-                        next_iteration_sum += A[i][j] * next_iteration[j] * current_iteration[j];
+                        sum -= A[i][j] * solution[j];
                     }
                 }
+                new_value = sum / A[i][i];
+                diff = abs(new_value - solution[i]); // calculo de la diferencia entre las soluciones
+                solution[i] = new_value;
 
-                next_value = (1 / A1[i][i]) * (b[i] - next_iteration_sum);
-                next_iteration[i] = next_value;
             }
-
-            solutions_norm = get_euclideam_norm(next_iteration, current_iteration);
 
             iter++;
 
-        } while(iter < 100);
+        } while(tolerance < diff);
 
         cout << "---------------------------------" << endl;
         cout << "Soluciones encontradas con la tolerancia establecida: " << endl;
-        cout << "[ " << next_iteration << "]" << endl;
+        cout << "[ " << solution << "]" << endl;
         cout << "Se requirieron " << iter << " iteraciones." << endl;
         cout << "---------------------------------" << endl;
      

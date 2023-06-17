@@ -82,34 +82,32 @@ namespace jacobi {
 
         vector<vector<double>> M = A;
         vector<vector<double>> N = A;
-        vector<vector<double>> solutions = get_x0(size_A); // vector de soluciones x_l y x_l+1
+        vector<double> x0(size_A, 0.0);
+        vector<double> solutions(size_A, 0.0);
+        double diff {0.0}; // diferencia entre las dos ultimas aproximaciones
 
         get_decomposition(A, M, N); // Ejecutamos la descomposicion de A en M y N
         
         short iter {0};
-        double solutions_norm = get_euclideam_norm(solutions[0], solutions[1]); 
         do {
             for(int i {0}; i < size_A; i++) {
-                double next_value; // valor del i-esimo elemento de la solucion para la siguiente iteracion.
-                double sum_N = 0.0; // sumatoria de los valores fuera de la diagonal en esta iteracion
+                double sum = b[i];
                 for(int j {0}; j < size_A; j++) {
                     if(j != i) {
-                       sum_N += N[i][j] * solutions[0][j];
+                       sum -= A[i][j] * x0[j];
                     }
                 }
-                next_value = (1 / M[i][i]) * (b[i] - sum_N);
-                solutions[1][i] = next_value;
+                solutions[i] = sum / A[i][i];
+                diff = abs(solutions[i] - x0[i]);
+                x0 = solutions;
             }
             
-            solutions_norm = get_euclideam_norm(solutions[0], solutions[1]);
-            solutions[0] = solutions[1]; // se define x_l+1 como el nuevo x_l
-
             iter++;
-        } while(tolerance <= solutions_norm);
+        } while(tolerance < diff);
 
         cout << "---------------------------------" << endl;
         cout << "Soluciones encontradas con la tolerancia establecida: " << endl;
-        cout << "[ " << solutions[1] << "]" << endl;
+        cout << "[ " << solutions << "]" << endl;
         cout << "Se requirieron " << iter << " iteraciones." << endl;
         cout << "---------------------------------" << endl;
 

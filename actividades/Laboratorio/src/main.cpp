@@ -30,8 +30,8 @@ int main() {
 
     unsigned t0 = clock();
     
-    //short code = jacobi::jacobi(A, b, e0);
-    short code = gauss_seidel::gauss_seidel(A, b, e0);
+    short code = jacobi::jacobi(A, b, e0);
+    short code2 = gauss_seidel::gauss_seidel(A, b, e0);
     //short code = lu::execute_lu(A, b, e0);
 
     unsigned t1 = clock();
