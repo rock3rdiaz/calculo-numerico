@@ -2,6 +2,7 @@
 #define GAUSS_SEIDEL_H
 
 #include <iostream>
+#include <algorithm>
 #include "utils.h"
 
 using namespace std;
@@ -18,7 +19,7 @@ namespace gauss_seidel {
     */
     void get_decomposition(const vector<vector<double>> &A, vector<vector<double>> &A1, 
             vector<vector<double>> &A2) {
-        double size_A = A[0].size();
+        double size_A = A.size();
         
         for(int i {0}; i < size_A; i++) {
             for(int j {0}; j < size_A; j++) {
@@ -39,20 +40,21 @@ namespace gauss_seidel {
         cout << "---------------------------------" << endl;
     }
 
-    /**
-     * Metodo que genera la primera aproximacion de la solucion.
+     /* Metodo que genera la primera aproximacion de la solucion.
      *
      * @param initial_approx: Referencia al vector solucion.
      * @param size: Tamaño del vector solucion.
      *
      */
-    vector<double> get_x0(int size) {
-        vector<double> x0(size, 0.0);
+    vector<vector<double>> get_x0(int size) {
+        vector<vector<double>> x0(2, vector<double>(size, 0.0));
 
         cout << "---------------------------------" << endl;
-        cout << "2. Generacion de la aproximacion inicial: " << endl;
-        cout << "=> x0: " << endl;
-        cout << x0 << endl;
+        cout << "Generacion de la aproximacion inicial: " << endl;
+        cout << "=> x_l: " << endl;
+        cout << x0[0] << endl;
+        cout << "=> x_l+1: " << endl;
+        cout << x0[1] << endl;
         cout << "---------------------------------" << endl;
 
         return x0;
@@ -75,44 +77,47 @@ namespace gauss_seidel {
             return -1;
         }
 
-        double size_A = A[0].size();
+        double size_A = A.size();
 
         vector<vector<double>> A1 = A;
         vector<vector<double>> A2 = A;
-        vector<double> solutions = get_x0(size_A); // vector de soluciones
 
         get_decomposition(A, A1, A2); // Ejecutamos la descomposicion de A en A1 y A2
 
         short iter {0};
-        double fx_solutions = get_fx(A, b, solutions);
-        while(tolerance < fx_solutions) {
+
+        vector<double> current_iteration(size_A, 0.0); // almacenara los valores de la iteracion actual
+        vector<double> next_iteration(size_A, 0.0); // almacenara los valores de la siguiente iteracion
+
+        double solutions_norm = get_euclideam_norm(next_iteration, current_iteration); 
+        do {
             for(int i {0}; i < size_A; i++) {
                 double next_value; // valor del i-esimo elemento de la solucion.
-                double sum_N; // sumatoria de los valores fuera de la diagonal en esta iteracion
+                double current_iteration_sum; // sumatoria de los valores de la solucion actual (x_l)
+                double next_iteration_sum; // sumatoria de los valores de la siguiente iteracion (x_l+1)
+            
                 for(int j {0}; j < size_A; j++) {
                     if(j != i) {
-                        sum_N = A1[i][j] * solutions[j];
+                        next_iteration_sum += A[i][j] * next_iteration[j] * current_iteration[j];
                     }
                 }
-                next_value = (1 / A2[i][i]) * (b[i] - sum_N);
-                solutions[i] = next_value;
+
+                next_value = (1 / A1[i][i]) * (b[i] - next_iteration_sum);
+                next_iteration[i] = next_value;
             }
 
-            cout << "---------------------------------" << endl;
-            cout << "3. Soluciones aproximadas: " << endl;
-            cout << solutions << endl;
-            cout << "---------------------------------" << endl;
-
-            fx_solutions = get_fx(A, b, solutions);
-
-            cout << "---------------------------------" << endl;
-            cout << "4. Aproximacion al valor de tolerancia en la iteracion " << iter << endl;
-            cout << fx_solutions << endl;
-            cout << "---------------------------------" << endl;
+            solutions_norm = get_euclideam_norm(next_iteration, current_iteration);
 
             iter++;
-        }
 
+        } while(iter < 100);
+
+        cout << "---------------------------------" << endl;
+        cout << "Soluciones encontradas con la tolerancia establecida: " << endl;
+        cout << "[ " << next_iteration << "]" << endl;
+        cout << "Se requirieron " << iter << " iteraciones." << endl;
+        cout << "---------------------------------" << endl;
+     
         return 0;
     } 
 }

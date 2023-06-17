@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "utils.h"
+#include <algorithm>
 
 using namespace std;
 using namespace utils;
@@ -18,7 +19,7 @@ namespace jacobi {
     */
     void get_decomposition(const vector<vector<double>> &A, vector<vector<double>> &M, 
             vector<vector<double>> &N) {
-        double size_A = A[0].size();
+        double size_A = A.size();
         
         for(int i {0}; i < size_A; i++) {
             for(int j {0}; j < size_A; j++) {
@@ -31,7 +32,7 @@ namespace jacobi {
         }
 
         cout << "---------------------------------" << endl;
-        cout << "2. Descomposicion de la matriz A: " << endl;
+        cout << "Descomposicion de la matriz A: " << endl;
         cout << "=> M: " << endl;
         cout << M << endl;
         cout << "=> N: " << endl;
@@ -46,13 +47,15 @@ namespace jacobi {
      * @param size: Tamaño del vector solucion.
      *
      */
-    vector<double> get_x0(int size) {
-        vector<double> x0(size, 0.0);
+    vector<vector<double>> get_x0(int size) {
+        vector<vector<double>> x0(2, vector<double>(size, 0.0));
 
         cout << "---------------------------------" << endl;
-        cout << "1. Generacion de la aproximacion inicial: " << endl;
-        cout << "=> x0: " << endl;
-        cout << x0 << endl;
+        cout << "Generacion de la aproximacion inicial: " << endl;
+        cout << "=> x_l: " << endl;
+        cout << x0[0] << endl;
+        cout << "=> x_l+1: " << endl;
+        cout << x0[1] << endl;
         cout << "---------------------------------" << endl;
 
         return x0;
@@ -75,43 +78,40 @@ namespace jacobi {
             return -1;
         }
 
-        double size_A = A[0].size();
+        double size_A = A.size();
 
         vector<vector<double>> M = A;
         vector<vector<double>> N = A;
-        vector<double> solutions = get_x0(size_A); // vector de soluciones
+        vector<vector<double>> solutions = get_x0(size_A); // vector de soluciones x_l y x_l+1
 
         get_decomposition(A, M, N); // Ejecutamos la descomposicion de A en M y N
         
         short iter {0};
-        double fx_solutions = get_fx(A, b, solutions);
-        while(tolerance < fx_solutions) {
+        double solutions_norm = get_euclideam_norm(solutions[0], solutions[1]); 
+        do {
             for(int i {0}; i < size_A; i++) {
-                double next_value; // valor del i-esimo elemento de la solucion.
+                double next_value; // valor del i-esimo elemento de la solucion para la siguiente iteracion.
                 double sum_N = 0.0; // sumatoria de los valores fuera de la diagonal en esta iteracion
                 for(int j {0}; j < size_A; j++) {
                     if(j != i) {
-                       sum_N += N[i][j] * solutions[j];
+                       sum_N += N[i][j] * solutions[0][j];
                     }
                 }
                 next_value = (1 / M[i][i]) * (b[i] - sum_N);
-                solutions[i] = next_value;
+                solutions[1][i] = next_value;
             }
             
-            cout << "---------------------------------" << endl;
-            cout << "3. Soluciones aproximadas en la iteracion " << iter << endl;
-            cout << solutions << endl;
-            cout << "---------------------------------" << endl;
-            
-            fx_solutions = get_fx(A, b, solutions);
-
-            cout << "---------------------------------" << endl;
-            cout << "4. Aproximacion al valor de tolerancia en la iteracion " << iter << endl;
-            cout << fx_solutions << endl;
-            cout << "---------------------------------" << endl;
+            solutions_norm = get_euclideam_norm(solutions[0], solutions[1]);
+            solutions[0] = solutions[1]; // se define x_l+1 como el nuevo x_l
 
             iter++;
-        }
+        } while(tolerance <= solutions_norm);
+
+        cout << "---------------------------------" << endl;
+        cout << "Soluciones encontradas con la tolerancia establecida: " << endl;
+        cout << "[ " << solutions[1] << "]" << endl;
+        cout << "Se requirieron " << iter << " iteraciones." << endl;
+        cout << "---------------------------------" << endl;
 
         return 0;
     } 

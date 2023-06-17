@@ -69,12 +69,12 @@ namespace utils {
      * @param A: Referencia a la matriz de coeficientes
      * @param b: Referencia al vector de terminos independientes
      * @param solutions: Referencia al vector de soluciones aproximadas
-     * @return Aproximacion a el resultado exacto
+     * @return Vector con los valores de usar las aproximaciones en el sistema
      */
     double get_fx(const vector<vector<double>> &A, const vector<double> &b, const vector<double> &solutions) {
         short size = b.size();
 
-        // error aproximado
+        // Valores del sistema evaluando la aproximacion recibida
         vector<double> fx_items;
 
         for(int i {0}; i < size; i++) {
@@ -82,10 +82,30 @@ namespace utils {
             for(int j {0}; j < size; j++) {
                 fx_value += A[i][j] * solutions[j];
             }
-            fx_items.push_back(abs(fx_value - b[i]));        
+            fx_items.push_back(abs(fx_value - b[i]));
+        }
+        return accumulate(fx_items.begin(), fx_items.end(), 0.0);
+    }
+
+    /**
+    *
+    * Metodo que calcula la norma euclidea de la diferencia entre una aproximacion anterior y una aproximacion actual.
+    * 
+    * @param x0: Referencia el vector de soluciones x_l
+    * @param x1: Referencia al vector de soluciones x_l+1
+    * @return Norma euclidea de esta diferencia
+    *
+    */
+    double get_euclideam_norm(const vector<double> &x0, const vector<double> &x1) {
+        vector<double> diff (x0.size(), 0.0);
+        double sum {0.0};
+
+        for(int i {0}; i < x0.size(); i++) {
+            diff[i] = (x0[i] - x1[i]);
+            sum += pow(diff[i], 2);
         }
 
-        return accumulate(fx_items.begin(), fx_items.end(), 0.0);
+        return sqrt(sum);
     }
 }
 
