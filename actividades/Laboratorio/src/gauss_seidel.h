@@ -40,26 +40,6 @@ namespace gauss_seidel {
         cout << "---------------------------------" << endl;
     }
 
-     /* Metodo que genera la primera aproximacion de la solucion.
-     *
-     * @param initial_approx: Referencia al vector solucion.
-     * @param size: Tamaño del vector solucion.
-     *
-     */
-    vector<vector<double>> get_x0(int size) {
-        vector<vector<double>> x0(2, vector<double>(size, 0.0));
-
-        cout << "---------------------------------" << endl;
-        cout << "Generacion de la aproximacion inicial: " << endl;
-        cout << "=> x_l: " << endl;
-        cout << x0[0] << endl;
-        cout << "=> x_l+1: " << endl;
-        cout << x0[1] << endl;
-        cout << "---------------------------------" << endl;
-
-        return x0;
-    }
-
     /**
     *
     * Metodo que calcula la solucion de un sistema de la forma Ax = b usando el 
@@ -72,6 +52,8 @@ namespace gauss_seidel {
     *
     */
     int gauss_seidel(const vector<vector<double>> &A, const vector<double> &b, double tolerance) {
+        cout << "++++++++++++++++++++++++ Metodo Gauss-Seidel ++++++++++++++++++" << endl;
+
         if(!is_diagonal(A)) {
             cout << "La matriz A no es predominante diagonal" << endl;
             return -1;
@@ -92,14 +74,14 @@ namespace gauss_seidel {
 
         do {
             for(int i {0}; i < size_A; i++) {
-                double sum = b[i];
+                double sum = 0.0;
             
                 for(int j {0}; j < size_A; j++) {
                     if(j != i) {
-                        sum -= A[i][j] * solution[j];
+                        sum += A[i][j] * solution[j];
                     }
                 }
-                new_value = sum / A[i][i];
+                new_value = (1 / A[i][i]) * (b[i] - sum);
                 diff = abs(new_value - solution[i]); // calculo de la diferencia entre las soluciones
                 solution[i] = new_value;
 

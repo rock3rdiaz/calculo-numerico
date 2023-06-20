@@ -86,27 +86,6 @@ namespace utils {
         }
         return accumulate(fx_items.begin(), fx_items.end(), 0.0);
     }
-
-    /**
-    *
-    * Metodo que calcula la norma euclidea de la diferencia entre una aproximacion anterior y una aproximacion actual.
-    * 
-    * @param x0: Referencia el vector de soluciones x_l
-    * @param x1: Referencia al vector de soluciones x_l+1
-    * @return Norma euclidea de esta diferencia
-    *
-    */
-    double get_euclideam_norm(const vector<double> &x0, const vector<double> &x1) {
-        vector<double> diff (x0.size(), 0.0);
-        double sum {0.0};
-
-        for(int i {0}; i < x0.size(); i++) {
-            diff[i] = (x0[i] - x1[i]);
-            sum += pow(diff[i], 2);
-        }
-
-        return sqrt(sum);
-    }
 }
 
 #endif

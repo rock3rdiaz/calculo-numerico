@@ -119,6 +119,8 @@ namespace lu {
      */
     int execute_lu(const vector<vector<double>> &A, const vector<double> &b,
             double tolerance) {
+        cout << "++++++++++++++++++++++++ Metodo LU ++++++++++++++++++" << endl;
+
         if(!is_diagonal(A)) {
             cout << "La matriz A no es predominante diagonal" << endl;
             return -1;

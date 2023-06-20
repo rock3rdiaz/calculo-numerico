@@ -1,3 +1,10 @@
+/**
+ * Laboratorio calculo numerico.
+ *
+ * @autores: rogers_diaz, alicia_arellano, ivan_santiago
+ *
+ */
+
 #include <iostream>
 #include <ctime>
 #include <iomanip>
@@ -30,15 +37,15 @@ int main() {
 
     unsigned t0 = clock();
     
-    short code = jacobi::jacobi(A, b, e0);
-    short code2 = gauss_seidel::gauss_seidel(A, b, e0);
-    //short code = lu::execute_lu(A, b, e0);
+    short jacobi_code = jacobi::jacobi(A, b, e0);
+    short gauss_code = gauss_seidel::gauss_seidel(A, b, e0);
+    short lu_code = lu::execute_lu(A, b, e0);
 
     unsigned t1 = clock();
 
     double time_elapsed = (double(t1 - t0) / CLOCKS_PER_SEC);
 
-    if(code == 0) {
+    if(jacobi_code == 0 and gauss_code == 0 and lu_code == 0) {
         cout << "---------------------------------" << endl;
         cout << " Proceso finalizado con exito. Tiempo de ejecucion " << time_elapsed << " segundos." << endl;
         cout << "---------------------------------" << endl;
